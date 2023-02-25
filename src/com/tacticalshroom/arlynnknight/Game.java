@@ -27,7 +27,8 @@ public class Game extends PApplet {
     PImage infoButton;
     PImage exit;
     PImage settings;
-    PImage slash;
+    PImage slash1;
+    PImage slash2;
     PImage arena;
     PImage yarnBall;
     PImage eSymbol;
@@ -49,10 +50,10 @@ public class Game extends PApplet {
     PImage wave4;
     PImage wave5;
 
-    PImage cootsFace;
-    PImage cootsMad;
-    PImage cootsDead;
-    PImage paw;
+    public PImage cootsFace;
+    public PImage cootsMad;
+    public PImage cootsDead;
+    public PImage paw;
 
     PImage playerMiddle;
     PImage playerLeft;
@@ -67,9 +68,12 @@ public class Game extends PApplet {
     public SoundFile rightFoot;
     public SoundFile dashSound;
     public SoundFile attackSound;
+    public SoundFile laserSound;
 
     SoundFile titleSong;
     SoundFile combatSong;
+    SoundFile bossSong;
+    SoundFile victorySong;
 
     private long lastTime;
     private int fps;
@@ -117,6 +121,10 @@ public class Game extends PApplet {
     int logoY;
     int dashX;
     int dashY;
+
+    int slashX = 0;
+    int slashY = 0;
+    float slashRot = 0;
     public void draw()  {
         background(20);
         counter ++;
@@ -139,6 +147,9 @@ public class Game extends PApplet {
                 }
                 if (combatSong.isPlaying()) {
                     combatSong.stop();
+                }
+                if (bossSong.isPlaying())   {
+                    bossSong.stop();
                 }
 
                 if (counter % 3 == 0)   {
@@ -214,17 +225,17 @@ public class Game extends PApplet {
                 }
                 image(exit, exitX, exitY);
 
-                int settingsX = displayWidth - settings.width - 35;
-                int settingsY = 35;
-                if (mouseOver(mouseX, mouseY, settingsX, settingsY, settings.width, settings.height) && ! showInfo) {
-                    settingsX += 5;
-                    settingsY -=5;
-                    if (mousePressed)   {
-                        openSound.play();
-                        state = GameState.SETTINGS;
-                    }
-                }
-                image(settings, settingsX, settingsY);
+//                int settingsX = displayWidth - settings.width - 35;
+//                int settingsY = 35;
+//                if (mouseOver(mouseX, mouseY, settingsX, settingsY, settings.width, settings.height) && ! showInfo) {
+//                    settingsX += 5;
+//                    settingsY -=5;
+//                    if (mousePressed)   {
+//                        openSound.play();
+//                        state = GameState.SETTINGS;
+//                    }
+//                }
+//                image(settings, settingsX, settingsY);
 
 
                 if (showInfo)   {
@@ -278,13 +289,16 @@ public class Game extends PApplet {
                 if (wave != 5 && !combatSong.isPlaying())  {
                     combatSong.play();
                 }
-                else if (wave == 5)    {
-
+                else if (wave == 5 && !bossSong.isPlaying() && coots.health > 0)    {
+                    bossSong.play();
+                    if (combatSong.isPlaying()) combatSong.stop();
                 }
 
                 if (!keysHeld.get(87) && !keysHeld.get(65) && !keysHeld.get(83) && !keysHeld.get(68) && dashStart == -1)   {
                     player.setMove(0, 0);
                 }
+
+
 
                 strokeWeight(0);
                 int boardX = displayWidth/5;
@@ -328,6 +342,26 @@ public class Game extends PApplet {
 
 
 
+                if (player.slashing)    {
+                    translate(player.getX() + player.getEntity().width/2, player.getY()+player.getEntity().height/2);
+                    rotate(slashRot);
+                    imageMode(CENTER);
+                    if (player.slashCounter > 5)    {
+                        image(slash1, slashX, slashY);
+                    }
+                    else    {
+                        image(slash2, slashX, slashY);
+                    }
+                    if (player.slashCounter == 0)   {
+                        player.slashing = false;
+                        slashX = 0;
+                        slashY = 0;
+                        slashRot = 0;
+                    }
+                    resetMatrix();
+                    imageMode(CORNER);
+                    player.slashCounter--;
+                }
                 //-------------------------------------------------------------Entity Loop---------------------------------------------
                 for (Entity entity : entities)  {
                     entity.update(this);
@@ -399,11 +433,17 @@ public class Game extends PApplet {
                     //----------------------------------------------KILLING ENTITIES----------------------------------------------------
 
                     entities.remove(entity);
-                    if (entity instanceof Brute)    {
+                    if (entity instanceof Brute brute)    {
                         killCount++;
-                        entities.add(new Milk(entity.getX(), entity.getY(), milk.width/5, milk.height/5));
+                        if (brute.loot())   {
+                            entities.add(new Milk(entity.getX(), entity.getY(), milk.width/5, milk.height/5));
+                        }
                     }
                     else if (entity instanceof Player)   {
+                        player = new Player(displayWidth/2, displayHeight/2, playerMiddle.width, playerMiddle.height, displayHeight/20);
+                        wave = 1;
+                        killCount = 0;
+
                         state = GameState.TITLE;
                     }
                     else if (entity instanceof Milk)    {
@@ -412,17 +452,18 @@ public class Game extends PApplet {
                     }
                     else if (entity instanceof Trap trap)    {
                         killCount++;
-                        entities.add(new Milk(entity.getX(), entity.getY(), milk.width/5, milk.height/5));
-                        entities.add(new Milk(entity.getX()+5, entity.getY()+5, milk.width/5, milk.height/5));
-                        entities.add(new Milk(entity.getX()+10, entity.getY()+10, milk.width/5, milk.height/5));
+                        if (trap.loot())    {
+                            entities.add(new Milk(entity.getX(), entity.getY(), milk.width/5, milk.height/5));
+                        }
+//                        entities.add(new Milk(entity.getX()+5, entity.getY()+5, milk.width/5, milk.height/5));
 
                         if (trap.trapping)  {
                             player.unTrap();
                         }
                     }
-                    else if (entity instanceof Mouse)   {
+                    else if (entity instanceof Mouse mouse)   {
                         killCount++;
-                        if (((Mouse) entity).loot())    {
+                        if (mouse.loot())    {
                             entities.add(new Milk(entity.getX(), entity.getY(), milk.width/5, milk.height/5));
                         }
                     }
@@ -498,6 +539,9 @@ public class Game extends PApplet {
                                 if (counter % 120 == 0) {
                                     entities.add(new Mouse(r.nextInt(displayWidth/5, 4 * displayWidth/5 - 100), r.nextInt(displayHeight/5, 4 * displayHeight/5 - 100), mouseMiddle.width, mouseMiddle.height, 5, mouseMiddle));
                                 }
+                                if (counter % 480 == 0)  {
+                                    entities.add(new Brute(r.nextInt(displayWidth/5, 4 * displayWidth/5 - 100), r.nextInt(displayHeight/5, 4 * displayHeight/5 - 100), 10));
+                                }
                             }
 
 
@@ -531,7 +575,7 @@ public class Game extends PApplet {
                             }
 
 
-                            nextWave(45);
+                            nextWave(60);
                             break;
                         case 4:
                             if (entityCount <= 10)  {
@@ -543,13 +587,13 @@ public class Game extends PApplet {
                                     entities.add(new Brute(r.nextInt(displayWidth/5, 4 * displayWidth/5 - 100), r.nextInt(displayHeight/5, 4 * displayHeight/5 - 100), 25));
                                 }
 
-//                                if (counter % 30 == 0) {
-//                                    entities.add(new Mouse(r.nextInt(displayWidth/5, 4 * displayWidth/5 - 100), r.nextInt(displayHeight/5, 4 * displayHeight/5 - 100), mouseMiddle.width, mouseMiddle.height, 5));
-//                                }
+                                if (counter % 45 == 0) {
+                                    entities.add(new Mouse(r.nextInt(displayWidth/5, 4 * displayWidth/5 - 100), r.nextInt(displayHeight/5, 4 * displayHeight/5 - 100), mouseMiddle.width, mouseMiddle.height, 5, mouseMiddle));
+                                }
                             }
 
 
-                            if (nextWave(55))   {
+                            if (nextWave(75))   {
                                 coots.hitBoxes.add(new Rectangle(displayWidth/2 - cootsFace.width/2, boardY - 2 * cootsFace.height/3, cootsFace.width, cootsFace.height));
                             }
                             break;
@@ -560,7 +604,7 @@ public class Game extends PApplet {
                             fill(0);
                             stroke(0);
 
-                            if (coots.health > 0)   {
+                            if (coots.health > coots.getMaxHealth()/2)   {
                                 if (entityCount <= 8)  {
                                     if (counter % 60 == 0) {
                                         entities.add(new Brute(r.nextInt(displayWidth/5, 4 * displayWidth/5 - 100), r.nextInt(displayHeight/5, 4 * displayHeight/5 - 100), 15));
@@ -575,19 +619,50 @@ public class Game extends PApplet {
                                     }
                                 }
 
+                                if (counter % 150 == 0)    {
+                                    cootsAttacking = true;
+                                    coots.pawAttack(player.getX()+currentPlayer.width/2, player.getY()+currentPlayer.height/2);
+                                }
+
                                 if (coots.hurt) {
                                     tint(150, 0, 0);
                                 }
                                 image(cootsFace, displayWidth/2.0f - cootsFace.width/2.0f, boardY - 2 * cootsFace.height/3.0f);
                                 tint(255, 255);
                             }
-                            else    {
-                                for (Entity entity : entities)  {
-                                    if (entity instanceof Brute)    {
-                                        entitiesToKill.add(entity);
+                            else if (coots.health > 0)  {
+                                if (entityCount <= 8)  {
+                                    if (counter % 60 == 0) {
+                                        entities.add(new Brute(r.nextInt(displayWidth/5, 4 * displayWidth/5 - 100), r.nextInt(displayHeight/5, 4 * displayHeight/5 - 100), 15));
+                                    }
+                                    if (counter % 180 == 0) {
+                                        Point coord = spawn(trapOpen.width, trapOpen.height);
+                                        entities.add(new Trap(coord.x, coord.y, trapOpen.width, trapOpen.height));
+                                    }
+                                    if (counter % 60 == 0) {
+                                        entities.add(new Mouse(r.nextInt(displayWidth/5, 4 * displayWidth/5 - 100), r.nextInt(displayHeight/5, 4 * displayHeight/5 - 100), mouseMiddle.width, mouseMiddle.height, 5, mouseMiddle));
                                     }
                                 }
-                                image(cootsDead, displayWidth/2.0f - cootsFace.width/2.0f, boardY - 2 * cootsFace.height/3.0f);
+
+                                if (counter % 400 == 0)  {
+                                    coots.laserAttack();
+                                }
+                                if (counter % 110 == 0)    {
+                                    cootsAttacking = true;
+                                    coots.pawAttack(player.getX()+currentPlayer.width/2, player.getY()+currentPlayer.height/2);
+                                }
+
+                                image(cootsMad, displayWidth/2.0f - cootsFace.width/2.0f, boardY - 2 * cootsFace.height/3.0f);
+                            }
+                            else    {
+
+                                float cootsDeadX = displayWidth/2.0f - cootsFace.width/2.0f;
+                                float cootsDeadY = boardY - 2 * cootsFace.height/3.0f;
+                                if (coots.deathCounter > 60) {
+                                    cootsDeadX += (r.nextInt(10)-5);
+                                    cootsDeadY += (r.nextInt(10)-5);
+                                }
+                                image(cootsDead, cootsDeadX, cootsDeadY);
                             }
 
                             if (!attackingLeft) {
@@ -597,21 +672,15 @@ public class Game extends PApplet {
                                 image(paw, displayWidth/2.0f + arena.width/5.0f - paw.width/2.0f, boardY - paw.height/2.0f);
                             }
 
-
-
-                            if (counter % 240 == 0 && coots.health > 0)    {
-                                cootsAttacking = true;
-                                coots.pawAttack(player.getX()+currentPlayer.width/2, player.getY()+currentPlayer.height/2);
-                            }
-
                             if (coots.getHealth() <= 0) {
-                                entities.forEach(entity -> {
-                                    if (entity instanceof Brute || entity instanceof Trap || entity instanceof Milk)    {
-                                        entitiesToKill.add(entity);
-                                    }
-                                });
-
-                                if (!winSound.isPlaying()) winSound.play();
+                                entities = new ArrayList<>();
+                                entities.add(player);
+                                coots.deathCounter--;
+                                if (bossSong.isPlaying()) bossSong.stop();
+                                if (coots.deathCounter==209)    victorySong.play();
+                                if (coots.deathCounter <= 1)    {
+                                    state = GameState.TITLE;
+                                }
                             }
                             break;
                     }
@@ -729,35 +798,40 @@ public class Game extends PApplet {
                 switch (keyCode)    {
                     case 38:
                         if (player.attackCoolDown <= 0) {
-                            translate(player.getX(), player.getY());
-                            image(slash, -displayHeight/54, -player.getRange());
-                            resetMatrix();
+                            player.slash();
+                            this.slashX = 0;
+                            this.slashY = -2 * player.getEntity().height / 3;
+                            this.slashRot = 0;
+
                         }
                         player.attack(new Rectangle(player.getX()-displayHeight/54, player.getY()-player.getRange(), player.getEntity().width+displayHeight/27, player.getRange()));
                         break;
                     case 37:
                         if (player.attackCoolDown <= 0) {
-                            translate(player.getX(), player.getY());
-                            rotate(-HALF_PI);
-                            image(slash, -player.getEntity().height+displayHeight/54, -player.getRange());
+                            player.slash();
+                            this.slashX = 0;
+                            this.slashY = -2 * player.getEntity().height / 3;
+                            this.slashRot = -HALF_PI;
                             resetMatrix();
                         }
                         player.attack(new Rectangle(player.getX()-player.getRange(), player.getY()-displayHeight/54, player.getRange(), player.getEntity().height+displayHeight/27));
                         break;
                     case 40:
                         if (player.attackCoolDown <= 0) {
-                            translate(player.getX(), player.getY());
-                            rotate(PI);
-                            image(slash, -player.getEntity().width, -player.getEntity().height);
+                            player.slash();
+                            this.slashX = 0;
+                            this.slashY = -2 * player.getEntity().height / 3;
+                            this.slashRot = PI;
                             resetMatrix();
                         }
                         player.attack(new Rectangle(player.getX()-displayHeight/54, player.getY()+player.getEntity().height, player.getEntity().width+displayHeight/27, player.getRange()));
                         break;
                     case 39:
                         if (player.attackCoolDown <= 0) {
-                            translate(player.getX(), player.getY());
-                            rotate(HALF_PI);
-                            image(slash, -displayHeight/54, -player.getEntity().height-player.getRange()/2);
+                            player.slash();
+                            this.slashX = 0;
+                            this.slashY = -2 * player.getEntity().height / 3;
+                            this.slashRot = HALF_PI;
                             resetMatrix();
                         }
                         player.attack(new Rectangle(player.getX()+player.getEntity().width, player.getY()-displayHeight/54, player.getRange(), player.getEntity().height+displayHeight/27));
@@ -900,7 +974,8 @@ public class Game extends PApplet {
         playerMiddle = loadImage("player/playerMiddle.png");
         playerLeft = loadImage("player/playerLeft.png");
         playerRight = loadImage("player/playerRight.png");
-        slash = loadImage("player/slash.png");
+        slash1 = loadImage("player/slash1.png");
+        slash2 = loadImage("player/slash2.png");
         arena = loadImage("arena.png");
         milk = loadImage("milk.png");
         yarnBall = loadImage("yarnBall.png");
@@ -936,10 +1011,14 @@ public class Game extends PApplet {
         rightFoot = new SoundFile(this, "sounds/rightFoot.wav");
         dashSound = new SoundFile(this, "sounds/dash.wav");
         attackSound = new SoundFile(this, "sounds/attack.wav");
+        laserSound = new SoundFile(this, "sounds/laser.wav");
 
         //init music
         titleSong = new SoundFile(this, "music/title.wav");
         combatSong = new SoundFile(this, "music/combat.wav");
+        bossSong = new SoundFile(this, "music/boss.wav");
+        victorySong = new SoundFile(this, "music/victory.wav");
+
 
         //adjust volume
         dashSound.amp(1.0f);
@@ -948,6 +1027,8 @@ public class Game extends PApplet {
         hurtSound.amp(0.8f);
         titleSong.amp(0.1f);
         combatSong.amp(0.2f);
+        bossSong.amp(0.2f);
+        victorySong.amp(0.2f);
 
         //image resize
         arena.resize(3 * displayWidth/5,3 * displayHeight/5);
@@ -965,8 +1046,9 @@ public class Game extends PApplet {
         creditButton.resize(0, playButton.height);
         infoButton.resize(0, playButton.height);
         currentPlayer = playerMiddle;
-        player = new Player(displayWidth/2, displayHeight/2, playerMiddle.width, playerMiddle.height);
-        slash.resize(player.getEntity().width+40, player.getRange());
+        player = new Player(displayWidth/2, displayHeight/2, playerMiddle.width, playerMiddle.height, displayHeight/20);
+        slash1.resize(player.getEntity().width+40, 0);
+        slash2.resize(slash1.width, 0);
         yarnBall.resize(player.getEntity().width, player.getEntity().width);
         eSymbol.resize(strButton.width/3, strButton.width/3);
         rSymbol.resize(strButton.width/3, strButton.width/3);
@@ -993,18 +1075,18 @@ public class Game extends PApplet {
     }
 
     public void startGame() {
-        player = new Player(displayWidth/2, displayHeight/2, playerMiddle.width, playerMiddle.height);
+        player = new Player(displayWidth/2, displayHeight/2, playerMiddle.width, playerMiddle.height, displayHeight/20);
         entities = new ArrayList<>();
         entities.add(player);
-
+        killCount = 0;
 
         strButtonX = (4 * displayWidth/5) + (displayWidth / 25);
         dexButtonX = (4 * displayWidth/5) + (displayWidth / 25);
         healthButtonX = (4 * displayWidth/5) + (displayWidth / 25);
 
-        coots = new Coots(250, 7, 5, paw);
+        coots = new Coots(3, 5, 10, paw);
 
-        wave = 1;
+        wave = 5;
     }
     public static void main(String[] args)  {
         main("com.tacticalshroom.arlynnknight.Game");

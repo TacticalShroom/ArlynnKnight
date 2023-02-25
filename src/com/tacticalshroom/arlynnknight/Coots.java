@@ -2,7 +2,9 @@ package com.tacticalshroom.arlynnknight;
 
 import processing.core.PImage;
 
+import javax.sound.sampled.Line;
 import java.awt.*;
+import java.awt.geom.Line2D;
 import java.util.ArrayList;
 
 public class Coots {
@@ -12,12 +14,16 @@ public class Coots {
     int health;
     int dmgPaw;
     int dmgLaser;
+    int laserCoolDown;
+    int laserX;
+    int laserY;
     PImage paw;
 
     int attackX = -1, attackY = -1;
     Rectangle attackRect;
 
     public boolean hurt = false;
+    public int deathCounter = 210;
 
 
     public Coots(int health, int dmgPaw, int dmgLaser, PImage paw)  {
@@ -27,6 +33,9 @@ public class Coots {
         this.dmgLaser = dmgLaser;
         this.hitBoxes = new ArrayList<>();
         this.paw = paw;
+        this.laserCoolDown = 0;
+        this.laserX = 0;
+        this.laserY = 0;
     }
 
     int counter = 60;
@@ -79,6 +88,39 @@ public class Coots {
                 g.attackingLeft = false;
             }
         }
+
+        if (laserCoolDown > 0)  {
+            if (laserCoolDown == 75)   {
+                laserX = g.player.getX();
+                laserY = g.player.getY() + g.player.getEntity().width;
+            }
+            laserCoolDown--;
+            g.stroke(255, 0, 0);
+            g.strokeWeight(5);
+            if (laserCoolDown <= 5 && laserCoolDown >= 1) {
+                g.strokeWeight(20);
+                if (laserCoolDown == 5) {
+                    g.laserSound.play();
+
+                    Rectangle r = g.player.getEntity();
+                    Line2D l1 = new Line2D.Float(g.displayWidth/2 - g.cootsMad.width/5, g.displayHeight/5, laserX, laserY);
+                    Line2D l2 = new Line2D.Float(g.displayWidth/2 + g.cootsMad.width/5, g.displayHeight/5, laserX, laserY);
+
+                    if (l1.intersects(r) || l2.intersects(r))   {
+                        g.player.hit(this.dmgLaser);
+                    }
+                }
+            }
+            g.line(g.displayWidth/2 - g.cootsMad.width/5, g.displayHeight/5, laserX, laserY);
+            g.line(g.displayWidth/2 + g.cootsMad.width/5, g.displayHeight/5, laserX, laserY);
+        }
+        else    {
+            this.laserX = -1;
+            this.laserY = -1;
+        }
+
+
+
     }
 
     public void pawAttack(int x, int y)    {
@@ -98,5 +140,13 @@ public class Coots {
 
     public int getHealth() {
         return health;
+    }
+
+    public int getMaxHealth() {
+        return maxHealth;
+    }
+
+    public void laserAttack() {
+        laserCoolDown = 75;
     }
 }

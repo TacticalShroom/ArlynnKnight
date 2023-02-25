@@ -3,6 +3,7 @@ package com.tacticalshroom.arlynnknight.entities;
 import com.tacticalshroom.arlynnknight.Game;
 
 import java.awt.*;
+import java.util.Random;
 
 public class Brute extends Entity {
 
@@ -33,7 +34,9 @@ public class Brute extends Entity {
         }
     }
 
-
+    public boolean loot()   {
+        return new Random().nextInt(5) == 0;
+    }
 
     @Override
     public void attack(Rectangle hit) {

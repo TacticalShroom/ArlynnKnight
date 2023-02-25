@@ -42,7 +42,7 @@ public class Mouse extends Entity {
     }
 
     public boolean loot()  {
-        if (r.nextInt(2) == 0)  {
+        if (r.nextInt(6) == 0)  {
             return true;
         }
         return false;

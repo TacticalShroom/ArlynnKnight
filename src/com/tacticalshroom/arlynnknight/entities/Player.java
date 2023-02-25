@@ -1,6 +1,7 @@
 package com.tacticalshroom.arlynnknight.entities;
 
 import com.tacticalshroom.arlynnknight.Game;
+import processing.core.PImage;
 
 import java.awt.*;
 
@@ -13,10 +14,13 @@ public class Player extends Entity {
     public int dashCoolDown;
     public int maxHP;
     public int attackCoolDown;
+    public int slashCounter;
+
+    public boolean slashing = false;
 
 
-    public Player(int x, int y, int width, int height) {
-        super(x, y, width, height, 3, 20, 80, 4);
+    public Player(int x, int y, int width, int height, int range) {
+        super(x, y, width, height, 3, 20, range, 4);
 
         dex = 1;
         str = 1;
@@ -24,6 +28,7 @@ public class Player extends Entity {
         maxHP = health;
         attackCoolDown = 0;
         dashCoolDown = 0;
+        slashCounter = 10;
     }
 
 
@@ -51,6 +56,10 @@ public class Player extends Entity {
         this.trapped = false;
     }
 
+    public void slash() {
+        slashing = true;
+        slashCounter = 10;
+    }
 
     public void attack(Rectangle hit) {
         if (attackCoolDown <= 0)    {

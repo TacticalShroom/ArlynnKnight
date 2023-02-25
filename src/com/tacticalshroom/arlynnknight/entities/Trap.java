@@ -3,6 +3,7 @@ package com.tacticalshroom.arlynnknight.entities;
 import com.tacticalshroom.arlynnknight.Game;
 
 import java.awt.*;
+import java.util.Random;
 
 public class Trap extends Entity {
 
@@ -33,6 +34,10 @@ public class Trap extends Entity {
                 g.hurtSound.play();
             }
         }
+    }
+
+    public boolean loot()  {
+        return new Random().nextInt(3) == 0;
     }
 
     public void attack(Rectangle hit) {
