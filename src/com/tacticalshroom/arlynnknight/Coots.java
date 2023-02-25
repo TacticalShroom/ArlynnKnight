@@ -2,7 +2,6 @@ package com.tacticalshroom.arlynnknight;
 
 import processing.core.PImage;
 
-import javax.sound.sampled.Line;
 import java.awt.*;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;

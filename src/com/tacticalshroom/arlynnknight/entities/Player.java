@@ -69,13 +69,15 @@ public class Player extends Entity {
                     game.damage(entity, dmg*str);
                     int xDir = entity.x == this.x ? 0 : (entity.getX() - this.x) / Math.abs(entity.getX() - this.x);
                     int yDir = entity.y == this.y ? 0 : (entity.getY() - this.y) / Math.abs(entity.getY() - this.y);
-                    entity.setTempMove(xDir*5, yDir*5, 8);
+                    entity.setTempMove(xDir*7, yDir*7, 8);
                 }
             }
-            for (Rectangle rect : game.coots.getHitBoxes()) {
-                if (rect.intersects(hit) || rect.contains(hit)) {
-                    game.damage(game.coots, dmg*str);
-                    game.coots.hurt = true;
+            if (game.wave == 5) {
+                for (Rectangle rect : game.coots.getHitBoxes()) {
+                    if (rect.intersects(hit) || rect.contains(hit)) {
+                        game.damage(game.coots, dmg*str);
+                        game.coots.hurt = true;
+                    }
                 }
             }
         }

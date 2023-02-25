@@ -283,8 +283,8 @@ public class Game extends PApplet {
 
                 float volumeSliderX = (rangeBottom + (volumeSliderPos * (rangeTop - rangeBottom)));
 
-                if (mouseOver(mouseX, mouseY, (int) rangeBottom, displayHeight/2- volumeBar.height/2, (int) (rangeTop-rangeBottom), volumeBar.height) && mousePressed)    {
-                    volumeSliderPos = (mouseX - rangeBottom) / (rangeTop-rangeBottom);
+                if (mouseOver(mouseX, mouseY, (int) rangeBottom - 100, displayHeight/2- volumeBar.height/2, (int) (rangeTop-rangeBottom)+100, volumeBar.height) && mousePressed)    {
+                    volumeSliderPos = (Math.max(mouseX, rangeBottom) - rangeBottom) / (rangeTop-rangeBottom);
                     for (SoundFile s : sounds)  {
                         s.amp(volumeSliderPos);
                     }
@@ -475,7 +475,7 @@ public class Game extends PApplet {
                         }
                     }
                     else if (entity instanceof Player)   {
-                        player = new Player(displayWidth/2, displayHeight/2, playerMiddle.width, playerMiddle.height, displayHeight/20);
+                        player = new Player(displayWidth/2, displayHeight/2, playerMiddle.width, playerMiddle.height, displayHeight/18);
                         wave = 1;
                         killCount = 0;
 
@@ -580,7 +580,7 @@ public class Game extends PApplet {
                             }
 
 
-                            nextWave(28);
+                            nextWave(35);
                             break;
                         case 2:
                             if (entityCount <= 10)  {
@@ -593,7 +593,7 @@ public class Game extends PApplet {
                             }
 
 
-                            nextWave(45);
+                            nextWave(50);
                             break;
                         case 3:
                             if (entityCount <= 10)  {
@@ -610,7 +610,7 @@ public class Game extends PApplet {
                             }
 
 
-                            nextWave(60);
+                            nextWave(70);
                             break;
                         case 4:
                             if (entityCount <= 10)  {
@@ -628,14 +628,12 @@ public class Game extends PApplet {
                             }
 
 
-                            if (nextWave(75))   {
-                                coots.hitBoxes.add(new Rectangle(displayWidth/2 - cootsFace.width/2, boardY - 2 * cootsFace.height/3, cootsFace.width, cootsFace.height));
-                            }
+                            nextWave(85);
                             break;
                         case 5:
                             //---------------------------------------------------------------BOSS FIGHT------------------------------------------
 
-                            coots.tick(this, paw);
+
                             fill(0);
                             stroke(0);
 
@@ -679,15 +677,18 @@ public class Game extends PApplet {
                                     }
                                 }
 
-                                if (counter % 400 == 0)  {
+                                if (counter % 240 == 0)  {
                                     coots.laserAttack();
                                 }
                                 if (counter % 110 == 0)    {
                                     cootsAttacking = true;
                                     coots.pawAttack(player.getX()+currentPlayer.width/2, player.getY()+currentPlayer.height/2);
                                 }
-
+                                if (coots.hurt) {
+                                    tint(150, 0, 0);
+                                }
                                 image(cootsMad, displayWidth/2.0f - cootsFace.width/2.0f, boardY - 2 * cootsFace.height/3.0f);
+                                tint(255, 255);
                             }
                             else    {
 
@@ -699,6 +700,8 @@ public class Game extends PApplet {
                                 }
                                 image(cootsDead, cootsDeadX, cootsDeadY);
                             }
+
+                            coots.tick(this, paw);
 
                             if (!attackingLeft) {
                                 image(paw, displayWidth/2.0f - arena.width/5.0f - paw.width/2.0f, boardY - paw.height/2.0f);
@@ -998,64 +1001,64 @@ public class Game extends PApplet {
         keysHeld.put(68, false);
 
         //init images
-        logo = loadImage("logo.png");
-        exit = loadImage("exit.png");
-        settings = loadImage("settings.png");
-        playButton = loadImage("playButton.png");
-        creditButton = loadImage("creditButton.png");
-        infoButton = loadImage("infoButton.png");
-        strButton = loadImage("statButtons/strButton.png");
-        dexButton = loadImage("statButtons/dexButton.png");
-        potionButton = loadImage("statButtons/healthPotion.png");
-        playerMiddle = loadImage("player/playerMiddle.png");
-        playerLeft = loadImage("player/playerLeft.png");
-        playerRight = loadImage("player/playerRight.png");
-        slash1 = loadImage("player/slash1.png");
-        slash2 = loadImage("player/slash2.png");
-        arena = loadImage("arena.png");
-        milk = loadImage("milk.png");
-        yarnBall = loadImage("yarnBall.png");
-        eSymbol = loadImage("statButtons/E.png");
-        rSymbol = loadImage("statButtons/R.png");
-        fSymbol = loadImage("statButtons/F.png");
-        attackSymbol = loadImage("attackSymbol.png");
-        dashSymbol = loadImage("dashSymbol.png");
-        infoScreen = loadImage("info.png");
-        cootsFace = loadImage("coots/coots.png");
-        cootsMad = loadImage("coots/cootsMad.png");
-        cootsDead = loadImage("coots/cootsDead.png");
-        paw = loadImage("coots/paw.png");
-        trapOpen = loadImage("trap.png");
-        trapClosed = loadImage("trapClosed.png");
-        wave1 = loadImage("waves/wave1.png");
-        wave2 = loadImage("waves/wave2.png");
-        wave3 = loadImage("waves/wave3.png");
-        wave4 = loadImage("waves/wave4.png");
-        wave5 = loadImage("waves/wave5.png");
-        mouseMiddle = loadImage("mouseMiddle.png");
-        mouseBig = loadImage("mouseBig.png");
-        mouseSmall = loadImage("mouseSmall.png");
-        healthBarFrame = loadImage("healthBarFrame.png");
-        volumeBar = loadImage("volumeBar.png");
-        volumeSlider = loadImage("volumeSlider.png");
+        logo = loadImage("arlynnKnightAssets/logo.png");
+        exit = loadImage("arlynnKnightAssets/exit.png");
+        settings = loadImage("arlynnKnightAssets/settings.png");
+        playButton = loadImage("arlynnKnightAssets/playButton.png");
+        creditButton = loadImage("arlynnKnightAssets/creditButton.png");
+        infoButton = loadImage("arlynnKnightAssets/infoButton.png");
+        strButton = loadImage("arlynnKnightAssets/statButtons/strButton.png");
+        dexButton = loadImage("arlynnKnightAssets/statButtons/dexButton.png");
+        potionButton = loadImage("arlynnKnightAssets/statButtons/healthPotion.png");
+        playerMiddle = loadImage("arlynnKnightAssets/player/playerMiddle.png");
+        playerLeft = loadImage("arlynnKnightAssets/player/playerLeft.png");
+        playerRight = loadImage("arlynnKnightAssets/player/playerRight.png");
+        slash1 = loadImage("arlynnKnightAssets/player/slash1.png");
+        slash2 = loadImage("arlynnKnightAssets/player/slash2.png");
+        arena = loadImage("arlynnKnightAssets/arena.png");
+        milk = loadImage("arlynnKnightAssets/milk.png");
+        yarnBall = loadImage("arlynnKnightAssets/yarnBall.png");
+        eSymbol = loadImage("arlynnKnightAssets/statButtons/E.png");
+        rSymbol = loadImage("arlynnKnightAssets/statButtons/R.png");
+        fSymbol = loadImage("arlynnKnightAssets/statButtons/F.png");
+        attackSymbol = loadImage("arlynnKnightAssets/attackSymbol.png");
+        dashSymbol = loadImage("arlynnKnightAssets/dashSymbol.png");
+        infoScreen = loadImage("arlynnKnightAssets/info.png");
+        cootsFace = loadImage("arlynnKnightAssets/coots/coots.png");
+        cootsMad = loadImage("arlynnKnightAssets/coots/cootsMad.png");
+        cootsDead = loadImage("arlynnKnightAssets/coots/cootsDead.png");
+        paw = loadImage("arlynnKnightAssets/coots/paw.png");
+        trapOpen = loadImage("arlynnKnightAssets/trap.png");
+        trapClosed = loadImage("arlynnKnightAssets/trapClosed.png");
+        wave1 = loadImage("arlynnKnightAssets/waves/wave1.png");
+        wave2 = loadImage("arlynnKnightAssets/waves/wave2.png");
+        wave3 = loadImage("arlynnKnightAssets/waves/wave3.png");
+        wave4 = loadImage("arlynnKnightAssets/waves/wave4.png");
+        wave5 = loadImage("arlynnKnightAssets/waves/wave5.png");
+        mouseMiddle = loadImage("arlynnKnightAssets/mouseMiddle.png");
+        mouseBig = loadImage("arlynnKnightAssets/mouseBig.png");
+        mouseSmall = loadImage("arlynnKnightAssets/mouseSmall.png");
+        healthBarFrame = loadImage("arlynnKnightAssets/healthBarFrame.png");
+        volumeBar = loadImage("arlynnKnightAssets/volumeBar.png");
+        volumeSlider = loadImage("arlynnKnightAssets/volumeSlider.png");
 
         //init sounds
-        openSound = new SoundFile(this, "sounds/open.wav");
-        collectSound = new SoundFile(this, "sounds/collect.wav");
-        explosionSound = new SoundFile(this, "sounds/explosion.wav");
-        hurtSound = new SoundFile(this, "sounds/hurt.wav");
-        winSound = new SoundFile(this, "sounds/win.wav");
-        leftFoot = new SoundFile(this, "sounds/leftFoot.wav");
-        rightFoot = new SoundFile(this, "sounds/rightFoot.wav");
-        dashSound = new SoundFile(this, "sounds/dash.wav");
-        attackSound = new SoundFile(this, "sounds/attack.wav");
-        laserSound = new SoundFile(this, "sounds/laser.wav");
+        openSound = new SoundFile(this, "arlynnKnightAssets/sounds/open.wav");
+        collectSound = new SoundFile(this, "arlynnKnightAssets/sounds/collect.wav");
+        explosionSound = new SoundFile(this, "arlynnKnightAssets/sounds/explosion.wav");
+        hurtSound = new SoundFile(this, "arlynnKnightAssets/sounds/hurt.wav");
+        winSound = new SoundFile(this, "arlynnKnightAssets/sounds/win.wav");
+        leftFoot = new SoundFile(this, "arlynnKnightAssets/sounds/leftFoot.wav");
+        rightFoot = new SoundFile(this, "arlynnKnightAssets/sounds/rightFoot.wav");
+        dashSound = new SoundFile(this, "arlynnKnightAssets/sounds/dash.wav");
+        attackSound = new SoundFile(this, "arlynnKnightAssets/sounds/attack.wav");
+        laserSound = new SoundFile(this, "arlynnKnightAssets/sounds/laser.wav");
 
         //init music
-        titleSong = new SoundFile(this, "music/title.wav");
-        combatSong = new SoundFile(this, "music/combat.wav");
-        bossSong = new SoundFile(this, "music/boss.wav");
-        victorySong = new SoundFile(this, "music/victory.wav");
+        titleSong = new SoundFile(this, "arlynnKnightAssets/music/title.wav");
+        combatSong = new SoundFile(this, "arlynnKnightAssets/music/combat.wav");
+        bossSong = new SoundFile(this, "arlynnKnightAssets/music/boss.wav");
+        victorySong = new SoundFile(this, "arlynnKnightAssets/music/victory.wav");
 
 
         sounds.add(openSound);
@@ -1089,7 +1092,7 @@ public class Game extends PApplet {
         strButton.resize(displayHeight/5-25, displayHeight/5-25);
         dexButton.resize(displayHeight/5-25, displayHeight/5-25);
         potionButton.resize(displayHeight/5-25, displayHeight/5-25);
-        playerMiddle.resize(strButton.width / 2, 0);
+        playerMiddle.resize(4 * strButton.width / 7, 0);
         playerLeft.resize(playerMiddle.width, 0);
         playerRight.resize(playerMiddle.width, 0);
         milk.resize(0, strButton.height);
@@ -1100,7 +1103,7 @@ public class Game extends PApplet {
         creditButton.resize(0, playButton.height);
         infoButton.resize(0, playButton.height);
         currentPlayer = playerMiddle;
-        player = new Player(displayWidth/2, displayHeight/2, playerMiddle.width, playerMiddle.height, displayHeight/20);
+        player = new Player(displayWidth/2, displayHeight/2, playerMiddle.width, playerMiddle.height, displayHeight/18);
         slash1.resize(player.getEntity().width+40, 0);
         slash2.resize(slash1.width, 0);
         yarnBall.resize(player.getEntity().width, player.getEntity().width);
@@ -1131,7 +1134,7 @@ public class Game extends PApplet {
     }
 
     public void startGame() {
-        player = new Player(displayWidth/2, displayHeight/2, playerMiddle.width, playerMiddle.height, displayHeight/20);
+        player = new Player(displayWidth/2, displayHeight/2, playerMiddle.width, playerMiddle.height, displayHeight/18);
         entities = new ArrayList<>();
         entities.add(player);
         killCount = 0;
@@ -1140,7 +1143,8 @@ public class Game extends PApplet {
         dexButtonX = (4 * displayWidth/5) + (displayWidth / 25);
         healthButtonX = (4 * displayWidth/5) + (displayWidth / 25);
 
-        coots = new Coots(350, 5, 10, paw);
+        coots = new Coots(400, 5, 10, paw);
+        coots.hitBoxes.add(new Rectangle(displayWidth/2 - cootsFace.width/2, displayHeight/5 - 2 * cootsFace.height/3, cootsFace.width, cootsFace.height));
 
         wave = 1;
     }
