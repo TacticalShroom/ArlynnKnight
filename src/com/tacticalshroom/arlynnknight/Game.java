@@ -43,6 +43,8 @@ public class Game extends PApplet {
     PImage mouseBig;
     PImage mouseSmall;
     PImage healthBarFrame;
+    PImage volumeBar;
+    PImage volumeSlider;
 
     PImage wave1;
     PImage wave2;
@@ -74,6 +76,8 @@ public class Game extends PApplet {
     SoundFile combatSong;
     SoundFile bossSong;
     SoundFile victorySong;
+
+    ArrayList<SoundFile> sounds = new ArrayList<>();
 
     private long lastTime;
     private int fps;
@@ -109,6 +113,7 @@ public class Game extends PApplet {
     int xFacing = 0;
     int yFacing = -1;
     int dashStart = -1;
+    float volumeSliderPos = 1.0f;
     int waveTransitionCounter = 180;
     boolean showInfo = true;
     boolean cootsAttacking = false;
@@ -225,17 +230,23 @@ public class Game extends PApplet {
                 }
                 image(exit, exitX, exitY);
 
-//                int settingsX = displayWidth - settings.width - 35;
-//                int settingsY = 35;
-//                if (mouseOver(mouseX, mouseY, settingsX, settingsY, settings.width, settings.height) && ! showInfo) {
-//                    settingsX += 5;
-//                    settingsY -=5;
-//                    if (mousePressed)   {
-//                        openSound.play();
-//                        state = GameState.SETTINGS;
-//                    }
-//                }
-//                image(settings, settingsX, settingsY);
+                int settingsX = displayWidth - settings.width - 35;
+                int settingsY = 35;
+                if (mouseOver(mouseX, mouseY, settingsX, settingsY, settings.width, settings.height) && ! showInfo) {
+                    settingsX += 5;
+                    settingsY -=5;
+                    if (mousePressed)   {
+                        openSound.play();
+                        state = GameState.SETTINGS;
+                    }
+                }
+                image(settings, settingsX, settingsY);
+
+
+
+
+
+
 
 
                 if (showInfo)   {
@@ -259,9 +270,30 @@ public class Game extends PApplet {
                     titleSong.play();
                 }
 
+                imageMode(CENTER);
 
 
 
+                float volumeBarX = displayWidth/2.0f;
+                float volumeBarY = displayHeight/2.0f;
+                image(volumeBar, volumeBarX, volumeBarY);
+
+                float rangeBottom = displayWidth/2.0f-volumeBar.width/2.0f+volumeSlider.width/2.0f;
+                float rangeTop =  displayWidth/2.0f+volumeBar.width/2.0f-volumeSlider.width/2.0f;
+
+                float volumeSliderX = (rangeBottom + (volumeSliderPos * (rangeTop - rangeBottom)));
+
+                if (mouseOver(mouseX, mouseY, (int) rangeBottom, displayHeight/2- volumeBar.height/2, (int) (rangeTop-rangeBottom), volumeBar.height) && mousePressed)    {
+                    volumeSliderPos = (mouseX - rangeBottom) / (rangeTop-rangeBottom);
+                    for (SoundFile s : sounds)  {
+                        s.amp(volumeSliderPos);
+                    }
+                }
+
+                image(volumeSlider, volumeSliderX, displayHeight/2.0f);
+
+
+                imageMode(CORNER);
                 break;
             case CREDITS:
                 if (!titleSong.isPlaying()) {
@@ -272,11 +304,14 @@ public class Game extends PApplet {
                 fill(250);
                 textSize(55);
                 textAlign(CENTER, CENTER);
-                text("Programmer - Artist - Designer", displayWidth/2, displayHeight/2 - 200);
-                text("Music", displayWidth/2, displayHeight/2+100);
+                text("Programmer - Artist - Designer - Sound FX", displayWidth/2, displayHeight/2 - 200);
+                text("Music", displayWidth/2, displayHeight/2+50);
+                text("Creative Consult (Tester)", displayWidth/2, displayHeight/2 + 300);
                 textSize(40);
-                text("TacticalShroom - Gabriel Schallock", displayWidth/2, displayHeight/2-100);
-                text("Nicolas Schallock", displayWidth/2, displayHeight/2+200);
+                text("TacticalShroom#1848 - Gabriel Schallock", displayWidth/2, displayHeight/2-100);
+                text("Nicolas Schallock", displayWidth/2, displayHeight/2+150);
+                text("Kevin Sherrill", displayWidth/2, displayHeight/2+400);
+
 
                     break;
             case PLAYING:
@@ -545,7 +580,7 @@ public class Game extends PApplet {
                             }
 
 
-                            nextWave(20);
+                            nextWave(28);
                             break;
                         case 2:
                             if (entityCount <= 10)  {
@@ -678,6 +713,7 @@ public class Game extends PApplet {
                                 coots.deathCounter--;
                                 if (bossSong.isPlaying()) bossSong.stop();
                                 if (coots.deathCounter==209)    victorySong.play();
+                                if (coots.deathCounter==209)    winSound.play();
                                 if (coots.deathCounter <= 1)    {
                                     state = GameState.TITLE;
                                 }
@@ -1000,6 +1036,8 @@ public class Game extends PApplet {
         mouseBig = loadImage("mouseBig.png");
         mouseSmall = loadImage("mouseSmall.png");
         healthBarFrame = loadImage("healthBarFrame.png");
+        volumeBar = loadImage("volumeBar.png");
+        volumeSlider = loadImage("volumeSlider.png");
 
         //init sounds
         openSound = new SoundFile(this, "sounds/open.wav");
@@ -1020,15 +1058,31 @@ public class Game extends PApplet {
         victorySong = new SoundFile(this, "music/victory.wav");
 
 
+        sounds.add(openSound);
+        sounds.add(collectSound);
+        sounds.add(explosionSound);
+        sounds.add(hurtSound);
+        sounds.add(winSound);
+        sounds.add(leftFoot);
+        sounds.add(rightFoot);
+        sounds.add(dashSound);
+        sounds.add(attackSound);
+        sounds.add(laserSound);
+        sounds.add(titleSong);
+        sounds.add(combatSong);
+        sounds.add(bossSong);
+        sounds.add(victorySong);
+
+
         //adjust volume
-        dashSound.amp(1.0f);
-        attackSound.amp(0.25f);
-        collectSound.amp(0.6f);
-        hurtSound.amp(0.8f);
-        titleSong.amp(0.1f);
-        combatSong.amp(0.2f);
-        bossSong.amp(0.2f);
-        victorySong.amp(0.2f);
+//        dashSound.amp(1.0f);
+//        attackSound.amp(0.25f);
+//        collectSound.amp(0.6f);
+//        hurtSound.amp(0.8f);
+//        titleSong.amp(0.1f);
+//        combatSong.amp(0.2f);
+//        bossSong.amp(0.2f);
+//        victorySong.amp(0.1f);
 
         //image resize
         arena.resize(3 * displayWidth/5,3 * displayHeight/5);
@@ -1070,6 +1124,8 @@ public class Game extends PApplet {
         mouseBig.resize(mouseMiddle.width, mouseMiddle.height);
         mouseSmall.resize(mouseMiddle.width, mouseMiddle.height);
         healthBarFrame.resize(3 * displayWidth/25, 6 * displayHeight/10);
+        volumeBar.resize(logo.width, 0);
+        volumeSlider.resize(0, (int) (volumeBar.height*1.2));
 
         logoY = displayHeight/12;
     }
@@ -1084,9 +1140,9 @@ public class Game extends PApplet {
         dexButtonX = (4 * displayWidth/5) + (displayWidth / 25);
         healthButtonX = (4 * displayWidth/5) + (displayWidth / 25);
 
-        coots = new Coots(3, 5, 10, paw);
+        coots = new Coots(350, 5, 10, paw);
 
-        wave = 5;
+        wave = 1;
     }
     public static void main(String[] args)  {
         main("com.tacticalshroom.arlynnknight.Game");
