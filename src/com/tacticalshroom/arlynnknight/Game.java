@@ -50,7 +50,8 @@ public class Game extends PApplet {
     PImage wave5;
 
     PImage cootsFace;
-    PImage cootsMad;    PImage cootsDead;
+    PImage cootsMad;
+    PImage cootsDead;
     PImage paw;
 
     PImage playerMiddle;
@@ -68,6 +69,7 @@ public class Game extends PApplet {
     public SoundFile attackSound;
 
     SoundFile titleSong;
+    SoundFile combatSong;
 
     private long lastTime;
     private int fps;
@@ -134,6 +136,9 @@ public class Game extends PApplet {
             case TITLE:
                 if (!titleSong.isPlaying()) {
                     titleSong.play();
+                }
+                if (combatSong.isPlaying()) {
+                    combatSong.stop();
                 }
 
                 if (counter % 3 == 0)   {
@@ -270,9 +275,15 @@ public class Game extends PApplet {
                     titleSong.stop();
                 }
 
+                if (wave != 5 && !combatSong.isPlaying())  {
+                    combatSong.play();
+                }
+                else if (wave == 5)    {
+
+                }
+
                 if (!keysHeld.get(87) && !keysHeld.get(65) && !keysHeld.get(83) && !keysHeld.get(68) && dashStart == -1)   {
                     player.setMove(0, 0);
-                    System.out.println("going");
                 }
 
                 strokeWeight(0);
@@ -928,6 +939,7 @@ public class Game extends PApplet {
 
         //init music
         titleSong = new SoundFile(this, "music/title.wav");
+        combatSong = new SoundFile(this, "music/combat.wav");
 
         //adjust volume
         dashSound.amp(1.0f);
@@ -935,6 +947,7 @@ public class Game extends PApplet {
         collectSound.amp(0.6f);
         hurtSound.amp(0.8f);
         titleSong.amp(0.1f);
+        combatSong.amp(0.2f);
 
         //image resize
         arena.resize(3 * displayWidth/5,3 * displayHeight/5);
