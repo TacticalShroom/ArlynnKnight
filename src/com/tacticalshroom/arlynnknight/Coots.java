@@ -89,7 +89,7 @@ public class Coots {
         }
 
         if (laserCoolDown > 0)  {
-            if (laserCoolDown == 75)   {
+            if (laserCoolDown == 45)   {
                 laserX = g.player.getX();
                 laserY = g.player.getY() + g.player.getEntity().width;
             }

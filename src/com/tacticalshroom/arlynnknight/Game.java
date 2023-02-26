@@ -1143,7 +1143,7 @@ public class Game extends PApplet {
         dexButtonX = (4 * displayWidth/5) + (displayWidth / 25);
         healthButtonX = (4 * displayWidth/5) + (displayWidth / 25);
 
-        coots = new Coots(450, 5, 10, paw);
+        coots = new Coots(500, 5, 10, paw);
         coots.hitBoxes.add(new Rectangle(displayWidth/2 - cootsFace.width/2, displayHeight/5 - 2 * cootsFace.height/3, cootsFace.width, cootsFace.height));
 
         wave = 1;
