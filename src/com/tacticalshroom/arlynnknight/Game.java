@@ -561,7 +561,7 @@ public class Game extends PApplet {
 
                 strokeWeight(0);
                 fill(255, 0, 0);
-                rect(displayWidth/25, displayHeight/5 + (20-player.getHealth())*(3*displayHeight / 100), 3 * displayWidth/25, player.getHealth()*(3*displayHeight / 100));
+                rect(displayWidth/25, displayHeight/5 + (player.getMaxHP()-player.getHealth())*(3*displayHeight / (5 * player.getMaxHP())), 3 * displayWidth/25, player.getHealth()*(3*displayHeight / (5 * player.getMaxHP())));
                 image(healthBarFrame, displayWidth/25, displayHeight/5);
 
 
@@ -1143,7 +1143,7 @@ public class Game extends PApplet {
         dexButtonX = (4 * displayWidth/5) + (displayWidth / 25);
         healthButtonX = (4 * displayWidth/5) + (displayWidth / 25);
 
-        coots = new Coots(400, 5, 10, paw);
+        coots = new Coots(450, 5, 10, paw);
         coots.hitBoxes.add(new Rectangle(displayWidth/2 - cootsFace.width/2, displayHeight/5 - 2 * cootsFace.height/3, cootsFace.width, cootsFace.height));
 
         wave = 1;

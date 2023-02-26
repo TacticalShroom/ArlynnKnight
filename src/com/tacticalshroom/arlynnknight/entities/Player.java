@@ -20,7 +20,7 @@ public class Player extends Entity {
 
 
     public Player(int x, int y, int width, int height, int range) {
-        super(x, y, width, height, 3, 20, range, 4);
+        super(x, y, width, height, 3, 25, range, 4);
 
         dex = 1;
         str = 1;
@@ -59,6 +59,10 @@ public class Player extends Entity {
     public void slash() {
         slashing = true;
         slashCounter = 10;
+    }
+
+    public int getMaxHP() {
+        return maxHP;
     }
 
     public void attack(Rectangle hit) {

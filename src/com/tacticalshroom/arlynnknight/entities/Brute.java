@@ -35,7 +35,7 @@ public class Brute extends Entity {
     }
 
     public boolean loot()   {
-        return new Random().nextInt(5) == 0;
+        return new Random().nextInt(4) == 0;
     }
 
     @Override

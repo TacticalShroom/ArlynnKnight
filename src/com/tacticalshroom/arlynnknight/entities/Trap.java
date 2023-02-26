@@ -8,7 +8,7 @@ import java.util.Random;
 public class Trap extends Entity {
 
     public Trap(int x, int y, int w, int h) {
-        super(x, y, w, h, 0, 25, 0, 5);
+        super(x, y, w, h, 0, 25, 0, 0);
     }
 
     public boolean trapping = false;
@@ -37,7 +37,7 @@ public class Trap extends Entity {
     }
 
     public boolean loot()  {
-        return new Random().nextInt(3) == 0;
+        return new Random().nextInt(1) == 0;
     }
 
     public void attack(Rectangle hit) {

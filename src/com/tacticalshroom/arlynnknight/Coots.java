@@ -146,6 +146,6 @@ public class Coots {
     }
 
     public void laserAttack() {
-        laserCoolDown = 75;
+        laserCoolDown = 45;
     }
 }
